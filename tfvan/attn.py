@@ -6,14 +6,14 @@ from keras.utils.tf_utils import shape_type_conversion
 
 
 @register_keras_serializable(package='TFVan')
-class Attention(layers.Layer):
+class AttentionLayer(layers.Layer):
     def __init__(self, kernel_size, **kwargs):
         super().__init__(**kwargs)
         self.input_spec = layers.InputSpec(ndim=4)
 
         self.kernel_size = normalize_tuple(kernel_size, 2, 'kernel_size')
 
-        self.dilation_rate = Attention.dilation(self.kernel_size[0]), Attention.dilation(self.kernel_size[1])
+        self.dilation_rate = AttentionLayer.dilation(self.kernel_size[0]), AttentionLayer.dilation(self.kernel_size[1])
         self.kernel_size_dw = self.dilation_rate[0] * 2 - 1, self.dilation_rate[1] * 2 - 1
         self.kernel_size_dwd = math.ceil(self.kernel_size[0] / self.dilation_rate[0]), \
                                math.ceil(self.kernel_size[1] / self.dilation_rate[1])
@@ -88,7 +88,7 @@ class SpatialAttention(layers.Layer):
         self.input_spec = layers.InputSpec(ndim=4, axes={-1: channels})
 
         self.proj1 = layers.Conv2D(channels, 1, name='proj_1')
-        self.attend = Attention(21, name='spatial_gating_unit')
+        self.attend = AttentionLayer(21, name='spatial_gating_unit')
         self.proj2 = layers.Conv2D(channels, 1, name='proj_2')
 
         super().build(input_shape)
